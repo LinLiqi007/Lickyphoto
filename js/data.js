@@ -30,14 +30,15 @@ const CategoryEnNames = {
   nature: 'NATURE'
 };
 
-const defaultFeatured = {"people":[1,3,5,7],"humanities":[8,9,10,11],"city":[12,21,18,16],"animal":[52,47,38,46],"nature":[53,84,57,92]};
+const defaultFeatured = {"people":[3,5,7,2],"humanities":[8,9,10,11],"city":[12,21,18,16],"animal":[52,47,38,46],"nature":[53,84,57,92]};
 
 const DEFAULT_PASSWORD = 'Linliqi050523@';
 window.DEFAULT_PASSWORD = DEFAULT_PASSWORD;
 
 async function apiGet(key, fallback) {
   try {
-    const res = await fetch(API[key]);
+    const url = API[key] + '?_=' + Date.now();
+    const res = await fetch(url, { cache: 'no-store' });
     if (res.ok) {
       const data = await res.json();
       return data ?? fallback;
