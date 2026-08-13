@@ -2,7 +2,7 @@
   'use strict';
 
   const ADMIN_PASSWORD = 'Linliqi050523@';
-  const SESSION_KEY = 'lky_admin_session_v2';
+  const SESSION_KEY = 'lky_admin_session_v3';
 
   let photos = [];
   let messages = [];
@@ -12,7 +12,7 @@
   let featuredState = {};
 
   function init() {
-    if (localStorage.getItem(SESSION_KEY) === '1') {
+    if (sessionStorage.getItem(SESSION_KEY) === '1') {
       showAdmin();
     } else {
       document.getElementById('adminLogin').style.display = 'flex';
@@ -46,7 +46,7 @@
   };
 
   window.adminLogout = function () {
-    localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
     document.getElementById('adminLogin').style.display = 'flex';
     document.getElementById('adminPage').style.display = 'none';
     document.getElementById('adminPassword').value = '';
