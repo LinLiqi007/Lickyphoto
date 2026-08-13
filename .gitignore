@@ -1,0 +1,12 @@
+# 依赖目录
+node_modules/
+# 系统缓存
+.DS_Store
+*.log
+# Vercel缓存
+.vercel/
+# 环境变量文件
+.env*
+.env.local
+# Git本地目录兜底
+.git/

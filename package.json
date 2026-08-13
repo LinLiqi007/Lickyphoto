@@ -1,0 +1,9 @@
+{
+  "name": "licky-photo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Licky Photography Portfolio",
+  "dependencies": {
+    "@vercel/kv": "^1.0.1"
+  }
+}

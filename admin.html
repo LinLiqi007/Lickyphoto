@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="height:auto;overflow-y:auto;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Licky · 后台管理</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { background: var(--bg-primary); user-select: text; -webkit-user-select: text; overflow-y: auto; overflow-x: hidden; height: auto; min-height: 100vh; }
+    .admin-login { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .admin-login-box { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 40px; width: 360px; }
+    .admin-login-box h2 { font-family: 'Playfair Display', serif; margin-bottom: 20px; text-align: center; letter-spacing: 2px; }
+    .admin-login-box input { width: 100%; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; color: var(--text-primary); font-size: 0.9rem; margin-bottom: 16px; outline: none; }
+    .admin-login-box input:focus { border-color: var(--accent); }
+    .admin-login-box button { width: 100%; padding: 12px; background: var(--accent); color: #000; font-weight: 600; border-radius: 4px; letter-spacing: 2px; }
+    .admin-login-box .error { color: #ff4757; font-size: 0.8rem; margin-bottom: 12px; text-align: center; min-height: 18px; }
+
+    .admin-page { display: none; padding: 100px 40px 60px; max-width: 1100px; margin: 0 auto; }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .admin-header h1 { font-family: 'Playfair Display', serif; font-size: 1.6rem; letter-spacing: 2px; }
+    .admin-actions { display: flex; gap: 10px; align-items: center; }
+    .admin-logout { padding: 8px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; font-size: 0.78rem; color: var(--text-secondary); }
+    .admin-logout:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .admin-back { padding: 8px 16px; font-size: 0.78rem; color: var(--accent); letter-spacing: 1px; }
+    .admin-back:hover { text-decoration: underline; }
+
+    .admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 30px; }
+    .admin-stat { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; }
+    .admin-stat-num { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--accent); }
+    .admin-stat-label { font-size: 0.62rem; color: var(--text-muted); letter-spacing: 2px; margin-top: 4px; text-transform: uppercase; }
+    .admin-stat.messages .admin-stat-num { color: #ff4757; }
+
+    .admin-section { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin-bottom: 24px; }
+    .admin-section h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 18px; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
+    .admin-section h3 .badge { background: var(--accent); color: #000; font-size: 0.65rem; padding: 3px 10px; border-radius: 12px; font-weight: 600; letter-spacing: 1px; }
+
+    .admin-upload-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 18px; }
+    .admin-upload-zone:hover { border-color: var(--accent); background: rgba(212,175,55,0.04); }
+    .admin-upload-zone.drag-over { border-color: var(--accent); background: rgba(212,175,55,0.08); }
+    .admin-upload-zone p { color: var(--text-secondary); font-size: 0.88rem; }
+    .admin-upload-zone p.hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 6px; }
+
+    .admin-upload-form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .admin-upload-form .full { grid-column: 1 / -1; }
+    .admin-upload-form label { font-size: 0.72rem; color: var(--text-secondary); letter-spacing: 1px; display: block; margin-bottom: 6px; }
+    .admin-upload-form input, .admin-upload-form select, .admin-upload-form textarea { width: 100%; padding: 10px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; color: var(--text-primary); font-size: 0.85rem; outline: none; }
+    .admin-upload-form input:focus, .admin-upload-form select:focus, .admin-upload-form textarea:focus { border-color: var(--accent); }
+    .admin-upload-form textarea { min-height: 70px; resize: vertical; }
+    .admin-upload-form button { padding: 12px 20px; background: var(--accent); color: #000; font-weight: 600; border-radius: 4px; letter-spacing: 2px; font-size: 0.82rem; }
+    .admin-upload-form button:hover { background: var(--accent-hover); }
+
+    .admin-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+    .admin-photo { position: relative; aspect-ratio: 4/3; border-radius: 6px; overflow: hidden; background: var(--bg-card); cursor: pointer; }
+    .admin-photo img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+    .admin-photo-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.65); opacity: 0; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .admin-photo:hover .admin-photo-overlay { opacity: 1; }
+    .admin-photo button { padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; letter-spacing: 1px; }
+    .admin-photo button.edit { background: var(--accent); color: #000; }
+    .admin-photo button.del { background: #ff4757; color: #fff; }
+    .admin-photo-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 5px 10px; background: linear-gradient(transparent, rgba(0,0,0,0.85)); font-size: 0.68rem; color: rgba(255,255,255,0.9); }
+
+    .admin-messages { display: flex; flex-direction: column; gap: 12px; }
+    .admin-msg-empty { text-align: center; padding: 50px 20px; color: var(--text-muted); font-size: 0.85rem; }
+    .admin-msg { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 16px 18px; position: relative; }
+    .admin-msg.unread { border-color: rgba(255,71,87,0.4); background: rgba(255,71,87,0.04); }
+    .admin-msg-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .admin-msg-head .left { display: flex; flex-direction: column; gap: 2px; }
+    .admin-msg-name { font-weight: 600; font-size: 0.92rem; letter-spacing: 0.3px; }
+    .admin-msg-email { font-size: 0.75rem; color: var(--accent); }
+    .admin-msg-type { display: inline-block; padding: 3px 10px; background: rgba(212,175,55,0.12); color: var(--accent); border-radius: 12px; font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; }
+    .admin-msg-time { font-size: 0.68rem; color: var(--text-muted); letter-spacing: 0.5px; }
+    .admin-msg-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin: 10px 0 12px; white-space: pre-wrap; word-break: break-word; }
+    .admin-msg-actions { display: flex; gap: 8px; }
+    .admin-msg-actions button { padding: 5px 10px; border-radius: 4px; font-size: 0.72rem; border: 1px solid var(--border); color: var(--text-secondary); background: var(--bg-primary); }
+    .admin-msg-actions button:hover { color: var(--text-primary); }
+    .admin-msg-actions button.mark-read.unread { color: #ff4757; border-color: rgba(255,71,87,0.3); }
+    .admin-msg-actions button.mark-read.read { color: var(--text-muted); }
+    .admin-msg-actions button.delete:hover { color: #ff4757; border-color: rgba(255,71,87,0.4); }
+    .admin-clear-all { margin-top: 10px; font-size: 0.72rem; color: var(--text-muted); }
+
+    @media (max-width: 900px) {
+      .admin-upload-form { grid-template-columns: 1fr; }
+      .admin-page { padding: 90px 16px 40px; }
+    }
+
+    .featured-cat { margin-bottom: 20px; }
+    .featured-cat-title { display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:0.88rem; color:var(--text-primary); letter-spacing:1px; }
+    .featured-cat-title .f-count { color:var(--accent); font-weight:600; font-size:0.76rem; }
+    .featured-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:10px; }
+    .featured-item { position:relative; aspect-ratio:4/3; border-radius:6px; overflow:hidden; background:var(--bg-card); cursor:pointer; border:2px solid transparent; transition:all 0.2s; }
+    .featured-item img { width:100%; height:100%; object-fit:cover; pointer-events:none; }
+    .featured-item .f-check { position:absolute; top:5px; right:5px; width:20px; height:20px; border-radius:50%; background:rgba(0,0,0,0.6); color:#fff; font-size:0.7rem; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.2s; }
+    .featured-item.selected { border-color:var(--accent); box-shadow:0 0 0 1px rgba(212,175,55,0.4); }
+    .featured-item.selected .f-check { opacity:1; background:var(--accent); color:#000; font-weight:700; }
+    .featured-item .f-label { position:absolute; bottom:0; left:0; right:0; padding:3px 8px; background:linear-gradient(transparent, rgba(0,0,0,0.8)); font-size:0.68rem; color:rgba(255,255,255,0.9); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  </style>
+</head>
+<body>
+
+<div class="admin-login" id="adminLogin">
+  <div class="admin-login-box">
+    <h2>◉ Licky Admin</h2>
+    <p style="text-align:center;color:var(--text-muted);font-size:0.8rem;margin-bottom:20px;">请输入管理员密码</p>
+    <div class="error" id="loginError"></div>
+    <input type="password" id="adminPassword" placeholder="密码" autocomplete="off">
+    <button onclick="adminLogin()">登录</button>
+    <p style="text-align:center;margin-top:14px;"><a href="index.html" class="admin-back" style="display:inline-block;">← 返回首页</a></p>
+  </div>
+</div>
+
+<div class="admin-page" id="adminPage">
+  <div class="admin-header">
+    <h1>◉ Licky 后台管理</h1>
+    <div class="admin-actions">
+      <a href="index.html" class="admin-back" target="_blank">← 查看首页</a>
+      <button class="admin-logout" onclick="adminLogout()">退出登录</button>
+    </div>
+  </div>
+
+  <div class="admin-stats" id="adminStats"></div>
+
+  <div class="admin-section">
+    <h3>上传新作品</h3>
+    <div class="admin-upload-zone" id="adminUploadZone">
+      <p>📤 点击或拖拽图片到此处</p>
+      <p class="hint">支持 JPG、PNG、WebP 格式</p>
+      <input type="file" id="adminFileInput" accept="image/*" hidden>
+    </div>
+    <div id="adminPreview" style="display:none;margin-bottom:18px;">
+      <img id="adminPreviewImg" style="max-width:100%;max-height:200px;border-radius:6px;border:1px solid var(--border);">
+    </div>
+    <form class="admin-upload-form" id="adminUploadForm">
+      <div>
+        <label>作品标题</label>
+        <input type="text" name="title" required placeholder="给你的作品起个名字">
+      </div>
+      <div>
+        <label>作品分类</label>
+        <select name="category" required>
+          <option value="people">人物</option>
+          <option value="humanities">人文</option>
+          <option value="city">城市</option>
+          <option value="animal">动物</option>
+          <option value="nature">自然</option>
+        </select>
+      </div>
+      <div class="full">
+        <label>作品描述</label>
+        <textarea name="description" placeholder="讲述照片背后的故事..."></textarea>
+      </div>
+      <div class="full" style="text-align:right;">
+        <button type="submit">发布作品</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="admin-section">
+    <h3>首页精选 <span style="color:var(--text-muted);font-size:0.72rem;font-weight:400;letter-spacing:1px;">每个分类最多 4 张 · 勾选后保存</span></h3>
+    <div id="adminFeatured"></div>
+    <div style="margin-top:14px;display:flex;gap:10px;">
+      <button class="admin-logout" onclick="saveFeaturedSelection()" style="background:var(--accent);color:#000;border-color:var(--accent);font-weight:600;">保存精选</button>
+      <button class="admin-logout" onclick="resetFeaturedToDefault()">恢复默认</button>
+    </div>
+  </div>
+
+  <div class="admin-section">
+    <h3>
+      合作邀约 / 留言
+      <span id="msgBadge" class="badge" style="display:none;"></span>
+    </h3>
+    <div class="admin-messages" id="adminMessages"></div>
+    <div style="text-align:right;margin-top:10px;">
+      <button class="admin-clear-all" onclick="clearAllMessages()">清空全部留言</button>
+    </div>
+  </div>
+
+  <div class="admin-section">
+    <h3>
+      评论管理
+      <span id="commentBadge" class="badge" style="display:none;"></span>
+    </h3>
+    <div id="adminComments" class="admin-comments"></div>
+  </div>
+
+  <div class="admin-section">
+    <h3>作品管理 <span id="adminPhotoCount" style="color:var(--text-muted);font-size:0.8rem;font-weight:400;"></span></h3>
+    <div class="admin-photos" id="adminPhotos"></div>
+    <div style="margin-top:20px;display:flex;gap:10px;">
+      <button class="admin-logout" onclick="resetAllData()" style="color:#ff4757;border-color:rgba(255,71,87,0.3);">重置所有数据（危险）</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js?v=40"></script>
+<script src="admin.js?v=40"></script>
+</body>
+</html>

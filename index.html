@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="horizontal-root">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Licky · 摄影作品集</title>
+  <link rel="stylesheet" href="css/styles.css?v=33">
+  <style>
+    /* === v29: FLEXBOX row-first (左→右排满再换行) === */
+    .works-main { width: 100% !important; min-width: 0 !important; }
+    .works-stream { padding: 20px 32px !important; overflow-y: auto !important; flex: 1 !important; width: 100% !important; box-sizing: border-box !important; }
+    .featured-grid {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 10px !important;
+      align-content: flex-start !important;
+      width: 100% !important;
+    }
+    .featured-item {
+      position: relative !important;
+      flex: 0 0 calc((100% - 40px) / 5) !important;
+      aspect-ratio: 4 / 3 !important;
+      border-radius: 6px !important;
+      overflow: hidden !important;
+      background: var(--bg-card) !important;
+      cursor: pointer !important;
+      border: 2px solid transparent !important;
+      transition: all 0.2s !important;
+      box-sizing: border-box !important;
+    }
+    .featured-item img { width:100%; height:100%; object-fit:cover; display:block; }
+    .featured-item .f-label {
+      position:absolute; bottom:0; left:0; right:0;
+      padding:3px 8px;
+      background:linear-gradient(transparent, rgba(0,0,0,0.8));
+      font-size:0.68rem; color:rgba(255,255,255,0.9);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      pointer-events:none;
+    }
+    @media (max-width: 1100px) {
+      .featured-item { flex: 0 0 calc((100% - 30px) / 4); }
+    }
+    @media (max-width: 850px) {
+      .featured-item { flex: 0 0 calc((100% - 20px) / 3); }
+    }
+    @media (max-width: 600px) {
+      .featured-item { flex: 0 0 calc((100% - 10px) / 2); }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="horizontal-body">
+  <nav class="top-toolbar">
+    <div class="tb-left">
+      <a href="#home" class="tb-logo" data-target="home">
+        <span class="logo-icon">◉</span>
+        <span class="logo-text">LICKY</span>
+      </a>
+    </div>
+    <div class="tb-right">
+      <button class="tb-burger" id="burgerBtn" aria-label="菜单">
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="h-scroll" id="hScroll">
+    <section id="home" class="h-section home-reel">
+      <div class="home-particles" aria-hidden="true"></div>
+      <div class="home-header">
+        <div class="home-title-area">
+          <p class="home-subtitle">◉ PHOTOGRAPHY PORTFOLIO</p>
+          <h1 class="home-title">光影长廊</h1>
+        </div>
+        <div class="home-cats" id="homeCats"></div>
+      </div>
+
+      <div class="film-reel-wrapper">
+        <div class="film-reel" id="filmReel">
+          <div class="film-sprocket-top"></div>
+          <div class="film-sprocket-bottom"></div>
+          <div class="film-track" id="filmTrack"></div>
+        </div>
+      </div>
+
+      <div class="home-footer">
+        <div class="home-stat">
+          <span class="home-stat-num" id="homeStatTotal">0</span>
+          <span class="home-stat-label">作品</span>
+        </div>
+        <div class="home-stat-sep"></div>
+        <div class="home-stat">
+          <span class="home-stat-num">5</span>
+          <span class="home-stat-label">分类</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="gallery" class="h-section works-section">
+      <div class="works-particles" aria-hidden="true"></div>
+      <div class="works-main">
+        <div class="works-header">
+          <div class="works-title-area">
+            <h2 class="section-title" id="galleryTitle">全部作品</h2>
+            <p class="section-subtitle" id="gallerySubtitle">每一帧都是独一无二的故事</p>
+          </div>
+          <div class="works-cats" id="worksCats"></div>
+        </div>
+        <div class="works-stream" id="worksStream"></div>
+        <div class="works-empty" id="worksEmpty" style="display:none;">
+          <div class="empty-icon">📷</div>
+          <p>暂无该分类作品</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="h-dots" id="hDots">
+    <button class="h-dot active" data-target="home"></button>
+    <button class="h-dot" data-target="gallery"></button>
+  </div>
+
+  <div class="side-panel" id="sidePanel">
+    <div class="side-panel-backdrop"></div>
+    <aside class="side-panel-inner">
+      <div class="sp-head">
+        <span class="sp-title">导航</span>
+        <button class="sp-close" id="spClose">✕</button>
+      </div>
+
+      <nav class="sp-nav">
+        <a href="#home" class="sp-nav-item active" data-target="home">
+          <span class="sp-nav-icon">◉</span>
+          <span>首页</span>
+        </a>
+        <a href="#gallery" class="sp-nav-item" data-target="gallery">
+          <span class="sp-nav-icon">▦</span>
+          <span>作品</span>
+        </a>
+        <button class="sp-nav-item" data-panel="about">
+          <span class="sp-nav-icon">◎</span>
+          <span>关于</span>
+        </button>
+        <button class="sp-nav-item" data-panel="contact">
+          <span class="sp-nav-icon">✉</span>
+          <span>联系</span>
+        </button>
+        <a href="admin.html" class="sp-nav-item sp-nav-admin" target="_blank">
+          <span class="sp-nav-icon">⚙</span>
+          <span>后台管理</span>
+        </a>
+      </nav>
+
+      <div class="sp-divider"></div>
+
+      <div class="sp-label">分类筛选</div>
+      <div class="sp-cats" id="spCats">
+        <button class="sp-cat active" data-category="all"><span>全部</span></button>
+        <button class="sp-cat" data-category="people"><span>人物</span></button>
+        <button class="sp-cat" data-category="humanities"><span>人文</span></button>
+        <button class="sp-cat" data-category="city"><span>城市</span></button>
+        <button class="sp-cat" data-category="animal"><span>动物</span></button>
+        <button class="sp-cat" data-category="nature"><span>自然</span></button>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <div class="sp-stat">
+        <span class="sp-stat-num" id="spTotal">0</span>
+        <span class="sp-stat-label">PHOTOS · 作品总数</span>
+      </div>
+
+      <div class="sp-foot">
+        <span class="sp-brand">◉ LICKY Photography</span>
+      </div>
+    </aside>
+  </div>
+
+  <div class="modal" id="aboutModal">
+    <div class="modal-backdrop" data-close="aboutModal"></div>
+    <div class="modal-content about-modal-content">
+      <button class="modal-close" data-close="aboutModal">✕</button>
+      <h2 class="modal-title">关于我</h2>
+      <p class="about-lead">摄影师 · Licky</p>
+      <p class="about-desc">
+        热爱生活，热爱镜头背后的每一个故事。我是 Licky，一名摄影师，
+        常驻广州。擅长人物肖像、人文纪实、城市光影以及动物摄影，
+        每一次按下快门，都是一次与世界的对话。
+      </p>
+    </div>
+  </div>
+
+  <div class="modal" id="contactModal">
+    <div class="modal-backdrop" data-close="contactModal"></div>
+    <div class="modal-content contact-modal-content">
+      <button class="modal-close" data-close="contactModal">✕</button>
+      <h2 class="modal-title">合作邀约</h2>
+      <p class="section-subtitle" style="text-align:center;margin-bottom:24px;">期待与你共同创造精彩</p>
+      <form class="contact-form" id="contactForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>姓名</label>
+            <input type="text" name="name" required placeholder="你的称呼">
+          </div>
+          <div class="form-group">
+            <label>邮箱</label>
+            <input type="email" name="email" required placeholder="your@email.com">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>合作类型</label>
+          <select name="type" required>
+            <option value="">请选择合作类型</option>
+            <option value="wedding">婚礼摄影</option>
+            <option value="portrait">人像写真</option>
+            <option value="commercial">商业拍摄</option>
+            <option value="travel">旅行纪实</option>
+            <option value="other">其他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>留言</label>
+          <textarea name="message" rows="4" required placeholder="描述一下你的想法或项目..."></textarea>
+        </div>
+        <button type="submit" class="submit-btn">发送邀约 →</button>
+      </form>
+      <div class="contact-info">
+        <div class="info-card">
+          <span class="info-label">邮箱</span>
+          <span class="info-value">14737659424@163.com</span>
+        </div>
+        <div class="info-card">
+          <span class="info-label">作者</span>
+          <span class="info-value">Licky</span>
+        </div>
+        <div class="info-card">
+          <span class="info-label">地址</span>
+          <span class="info-value">中国 · 广州</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-backdrop"></div>
+    <button class="lightbox-close" id="lightboxClose">✕</button>
+    <button class="lightbox-nav lightbox-prev" id="lightboxPrev">‹</button>
+    <button class="lightbox-nav lightbox-next" id="lightboxNext">›</button>
+    <div class="lightbox-content">
+      <div class="lightbox-image-wrapper">
+        <img class="lightbox-image" id="lightboxImage" alt="">
+        <div class="watermark-overlay">© Licky Photography</div>
+      </div>
+      <div class="lightbox-info">
+        <h3 id="lightboxTitle"></h3>
+        <p id="lightboxDesc"></p>
+        <div class="lightbox-meta">
+          <span id="lightboxCategory"></span>
+        </div>
+        <button class="lightbox-like" id="lightboxLike">
+          <span class="like-icon">♡</span>
+          <span class="like-count">0</span>
+        </button>
+        <div class="lightbox-comments">
+          <div class="comments-header">评论 <span class="comments-count" id="commentsCount">0</span></div>
+          <div class="comments-list" id="commentsList"></div>
+          <form class="comments-form" id="commentsForm">
+            <input type="text" id="commentName" placeholder="昵称（选填）" maxlength="20">
+            <textarea id="commentText" placeholder="写下你的评论…" maxlength="300" required></textarea>
+            <button type="submit">发送</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/data.js?v=33"></script>
+  <script src="js/main.js?v=33"></script>
+</body>
+</html>
