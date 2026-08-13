@@ -588,7 +588,11 @@
         time: Date.now()
       });
       allComments[photo.id] = arr;
-      await saveComments(allComments);
+      const ok = await saveComments(allComments);
+      if (!ok) {
+        showToast('评论保存失败，请稍后再试');
+        return;
+      }
       document.getElementById('commentText').value = '';
       renderComments(photo.id);
       showToast('评论已发布 💬');

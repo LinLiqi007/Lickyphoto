@@ -49,14 +49,23 @@ async function apiGet(key, fallback) {
 
 async function apiPost(key, value) {
   try {
-    await fetch(API[key], {
+    const res = await fetch(API[key], {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(value)
     });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok === false) {
+        console.warn('API error:', data.error);
+        return false;
+      }
+      return true;
+    }
   } catch (e) {
     console.warn('保存失败:', e);
   }
+  return false;
 }
 
 async function loadPhotos() {
